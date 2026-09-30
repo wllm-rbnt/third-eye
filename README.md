@@ -21,10 +21,10 @@ It can also be used to debug other implementations.
 
 ```bash
 # live preview
-sudo ./third-eye stream -o 'cmd:ffplay -fflags nobuffer -flags low_delay -i -'
+$ sudo ./third-eye stream -o 'cmd:ffplay -fflags nobuffer -flags low_delay -i -'
 
 # straight to a playable file
-sudo ./third-eye stream -o flight.mp4
+$ sudo ./third-eye stream -o flight.mp4
 ```
 
 It runs comfortably on a Raspberry Pi 4B with 2 GB of RAM.
@@ -146,11 +146,11 @@ to expect:
 The tool runs from the checkout; there is nothing to build.
 
 ```bash
-sudo apt install git ffmpeg
-git clone https://github.com/wllm-rbnt/third-eye.git third-eye
-cd third-eye
-chmod +x third-eye          # if the executable bit was lost in transit
-./third-eye --help          # or: python3 third-eye --help
+$ sudo apt install git ffmpeg
+$ git clone https://github.com/wllm-rbnt/third-eye.git third-eye
+$ cd third-eye
+$ chmod +x third-eye          # if the executable bit was lost in transit
+$ ./third-eye --help          # or: python3 third-eye --help
 ```
 
 On a Raspberry Pi 4B, prepare the USB-C port once:
@@ -160,24 +160,24 @@ On a Raspberry Pi 4B, prepare the USB-C port once:
 #    you want --transport ios. On Raspberry Pi OS (previously called Raspbian)
 #    the file is /boot/firmware/config.txt; on older images it is
 #    /boot/config.txt.
-echo 'dtoverlay=dwc2,dr_mode=peripheral' | sudo tee -a /boot/firmware/config.txt
+$ echo 'dtoverlay=dwc2,dr_mode=peripheral' | sudo tee -a /boot/firmware/config.txt
 
 # 2. Make sure otg_mode=1 is NOT set: it routes the USB-C port to the host-only
 #    controller and overrides dtoverlay=dwc2, leaving no UDC at all.
-grep -n '^otg_mode' /boot/firmware/config.txt      # expect no output
+$ grep -n '^otg_mode' /boot/firmware/config.txt      # expect no output
 
-sudo reboot
+$ sudo reboot
 
 # 3. Load the raw gadget driver, now and at every boot.
-sudo modprobe raw_gadget
-echo raw_gadget | sudo tee /etc/modules-load.d/raw_gadget.conf
+$ sudo modprobe raw_gadget
+$ echo raw_gadget | sudo tee /etc/modules-load.d/raw_gadget.conf
 
 # 4. For --transport ios only.
-sudo apt install libusb-1.0-0 raspi-utils
+$ sudo apt install libusb-1.0-0 raspi-utils
 
 # 5. Check.
-ls /sys/class/udc                 # expect fe980000.usb
-sudo ./third-eye doctor
+$ ls /sys/class/udc                 # expect fe980000.usb
+$ sudo ./third-eye doctor
 ```
 
 `doctor` reports the board model, the UDC device and driver names, what
@@ -194,7 +194,7 @@ on and link them to the aircraft.
 ## Usage
 
 ```
-third-eye [-v] COMMAND [options]
+$ third-eye [-v] COMMAND [options]
 ```
 
 | command | what it does | needs |
@@ -249,9 +249,9 @@ The port role can also be inspected and changed by hand. A port left in host
 mode is repaired automatically before the next iOS session.
 
 ```bash
-sudo ./third-eye role            # show controller, role, UDCs, runtime overlay
-sudo ./third-eye role host
-sudo ./third-eye role gadget
+$ sudo ./third-eye role            # show controller, role, UDCs, runtime overlay
+$ sudo ./third-eye role host       # set host role
+$ sudo ./third-eye role gadget     # set gadget role
 ```
 
 ### Outputs
@@ -296,23 +296,23 @@ Recording"**.
 
 ```bash
 # lowest-latency local preview
-sudo ./third-eye stream -o 'cmd:ffplay -fflags nobuffer -flags low_delay -framedrop -i -'
+$ sudo ./third-eye stream -o 'cmd:ffplay -fflags nobuffer -flags low_delay -framedrop -i -'
 
 # serve the stream over TCP and watch it from another machine
-sudo ./third-eye stream -o tcp:0.0.0.0:5000
-ffplay -fflags nobuffer tcp://raspberrypi.local:5000
+$ sudo ./third-eye stream -o tcp:0.0.0.0:5000
+$ ffplay -fflags nobuffer tcp://raspberrypi.local:5000
 
 # record a playable file (MP4, MKV, MOV, TS or FLV)
-sudo ./third-eye stream -o flight.mkv
+$ sudo ./third-eye stream -o flight.mkv
 
 # raw Annex-B, exactly the bytes off the wire
-sudo ./third-eye stream -o file:flight.h264
+$ sudo ./third-eye stream -o file:flight.h264
 
 # measure the link without keeping anything
-sudo ./third-eye stream -o null --stats 2
+$ sudo ./third-eye stream -o null --stats 2
 
 # the iOS transport, with a detailed log kept through Ctrl-C
-sudo ./third-eye stream -t ios -vv -o flight.h264 2>&1 | tee -i ios-session.log
+$ sudo ./third-eye stream -t ios -vv -o flight.h264 2>&1 | tee -i ios-session.log
 ```
 
 Stop with Ctrl-C. On `ios` the tool then cancels its reads and restores the
@@ -329,26 +329,26 @@ below are examples.
 
 ```bash
 # summarise a capture, list the 10 most common DUML commands, extract the video
-./third-eye decode android-session.pcapng --commands 10 -o file:out.h264
+$ ./third-eye decode android-session.pcapng --commands 10 -o file:out.h264
 
 # extract a capture's video as a playable MP4
-./third-eye decode android-session.pcapng -o mp4:out.mp4
+$ ./third-eye decode android-session.pcapng -o mp4:out.mp4
 
 # annotated tunnel listing (DUML decoded, frame boundaries marked)
-./third-eye dump android-session.pcapng --limit 20
+$ ./third-eye dump android-session.pcapng --limit 20
 
 # annotated enumeration and AOA or iAP2 control transfers
-./third-eye dump android-session.pcapng --control --limit 30
+$ ./third-eye dump android-session.pcapng --control --limit 30
 
 # decode the iAP2 session of an iOS capture, message by message
-./third-eye iap2 ios-session.pcapng
+$ ./third-eye iap2 ios-session.pcapng
 
 # ...and compare the replies of this package's iAP2 state machine with the iPhone's
-./third-eye iap2 ios-session.pcapng --compare
+$ ./third-eye iap2 ios-session.pcapng --compare
 
 # diagnostic: brute-force pic_init_qp (only useful on an excerpt without
 # parameter sets; the real value is 26)
-./third-eye tune excerpt.pcapng
+$ ./third-eye tune excerpt.pcapng
 ```
 
 `decode` on a recording of a handset session:
@@ -459,13 +459,13 @@ Where a field's meaning is unknown, the builder gives it a neutral name
 ## Tests
 
 ```bash
-python3 -m pytest tests/ -q
+$ python3 -m pytest tests/ -q
 ```
 
 Each file also runs on its own, without pytest:
 
 ```bash
-python3 tests/test_protocol.py
+$ python3 tests/test_protocol.py
 ```
 
 | file | covers |
@@ -494,7 +494,7 @@ Without them those tests are skipped and the rest run. To include them, point
 `captures/` directory beside the checkout):
 
 ```bash
-THIRDEYE_CAPTURES=/path/to/captures python3 -m pytest tests/ -q
+$ THIRDEYE_CAPTURES=/path/to/captures python3 -m pytest tests/ -q
 ```
 
 The test suite needs no hardware, no root and no third-party packages besides
