@@ -93,9 +93,8 @@ Not implemented: audio (none is carried), and any control over resolution or
 frame rate (the stream is 1920×1080 at 30 fps). Open questions are listed in
 [PROTOCOL.md §13](PROTOCOL.md#13-open-questions).
 
-Latency was not precisely measured yet. Here is a video that shows what to
-expect:
-[![Latency demo]()](./latency.mp4)
+Latency was not precisely measured yet. Here is a short video that shows what
+to expect: [![Latency demo](./latency.jpg)](./latency.mp4)
 
 ---
 
