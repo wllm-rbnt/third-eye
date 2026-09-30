@@ -93,6 +93,10 @@ Not implemented: audio (none is carried), and any control over resolution or
 frame rate (the stream is 1920×1080 at 30 fps). Open questions are listed in
 [PROTOCOL.md §13](PROTOCOL.md#13-open-questions).
 
+Latency was not precisely measured yet. Here is a video that shows what to
+expect:
+[![Latency demo]()](./latency.mp4)
+
 ---
 
 ## Hardware requirements
@@ -280,6 +284,10 @@ contains no parameter sets ([PROTOCOL.md §10](PROTOCOL.md#10-making-the-stream-
 With the defaults, a built SPS/PPS is byte for byte the goggles' own. The
 container outputs add the two `ffmpeg` options the stream needs (`-copyinkf`,
 `-r 30`), so `-o flight.mp4` is enough.
+
+*Note:* DJI OSD can be removed from the stream. For this, in the goggles menu, go
+to Settings -> Camera -> Advanced Camera Settings then toggle **"Camera View
+Recording"**.
 
 ### Examples
 
