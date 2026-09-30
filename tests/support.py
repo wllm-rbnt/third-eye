@@ -9,7 +9,7 @@ iPhone and Android handsets, and to this package's own client on a Raspberry
 Pi 4B. The captures are not distributed. When they are absent every test that
 needs them is skipped (never failed); the rest still run.
 
-To run the capture tests, point `DJIG3_CAPTURES` at the directory holding the
+To run the capture tests, point `THIRDEYE_CAPTURES` at the directory holding the
 files (a glob also works), or put them in a `captures/` directory beside this
 checkout. The files are named `dji_trace_<id>_<source>.pcapng`, where
 `<source>` says what was on the other end of the cable:
@@ -66,7 +66,7 @@ def default_capture_glob() -> str:
 
 
 def _as_glob(value: str) -> str:
-    """Accept either a directory or a glob in DJIG3_CAPTURES.
+    """Accept either a directory or a glob in THIRDEYE_CAPTURES.
 
     The variable is documented as "the directory holding dji_trace_*.pcapng",
     so a directory must not silently match nothing.
@@ -76,10 +76,10 @@ def _as_glob(value: str) -> str:
     return value
 
 
-CAPTURE_GLOB = _as_glob(os.environ.get("DJIG3_CAPTURES",
+CAPTURE_GLOB = _as_glob(os.environ.get("THIRDEYE_CAPTURES",
                                       default_capture_glob()))
 
-MISSING = ("no reference captures matched %s -- set DJIG3_CAPTURES to the "
+MISSING = ("no reference captures matched %s -- set THIRDEYE_CAPTURES to the "
            "directory holding dji_trace_*.pcapng" % CAPTURE_GLOB)
 
 

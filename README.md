@@ -1,19 +1,23 @@
 # third-eye
 
 Receive the live H.264 video stream of a **DJI Goggles 3** over USB on Linux.
+It can then be displayed on local HDMI output, stored in file, sent over the
+network or to a local command.
 It is the equivalent of [fpv-wtf/voc-poc](https://github.com/fpv-wtf/voc-poc)
 for the current generation of goggles, and an open counterpart to the
 closed-source [CosmoStreamer](https://cosmostreamer.com/products/djigoggles2/).
 
 Reverse-engineered from USB captures of an Android phone and an iPhone
-receiving the stream. The full protocol write-up is in
-[PROTOCOL.md](PROTOCOL.md).
+receiving the stream. The goal of this work is offering interoperability to the
+community. The full protocol write-up is in [PROTOCOL.md](PROTOCOL.md).
 
-The code is a reference implementation, meant to be read by people
-implementing the same protocols in their own tools. Nothing it sends is a
-stored copy of captured traffic: every USB descriptor, DUML payload, iAP2
-message and H.264 parameter set is built from named fields, and the test suite
-checks the result against what real phones and goggles put on the wire.
+The code itself can be used in production setup and it's also a kind of
+reference implementation, meant to be read by people implementing the same
+protocols in their own tools. Nothing it sends is a stored copy of captured
+traffic: every USB descriptor, DUML payload, iAP2 message and H.264 parameter
+set is built from named fields, and the test suite checks the result against
+what real phones and goggles put on the wire.
+It can also be used to debug other implementations.
 
 ```bash
 # live preview
@@ -135,7 +139,8 @@ frame rate (the stream is 1920×1080 at 30 fps). Open questions are listed in
 The tool runs from the checkout; there is nothing to build.
 
 ```bash
-git clone <repository-url> third-eye
+sudo apt install git ffmpeg
+git clone https://github.com/wllm-rbnt/third-eye.git third-eye
 cd third-eye
 chmod +x third-eye          # if the executable bit was lost in transit
 ./third-eye --help          # or: python3 third-eye --help
@@ -145,8 +150,9 @@ On a Raspberry Pi 4B, prepare the USB-C port once:
 
 ```bash
 # 1. Put the USB-C port under dwc2. Use dr_mode=otg instead of peripheral if
-#    you want --transport ios. On Bookworm and later the file is
-#    /boot/firmware/config.txt; on older images it is /boot/config.txt.
+#    you want --transport ios. On Raspberry Pi OS (previously called Raspbian)
+#    the file is /boot/firmware/config.txt; on older images it is
+#    /boot/config.txt.
 echo 'dtoverlay=dwc2,dr_mode=peripheral' | sudo tee -a /boot/firmware/config.txt
 
 # 2. Make sure otg_mode=1 is NOT set: it routes the USB-C port to the host-only
@@ -236,7 +242,7 @@ The port role can also be inspected and changed by hand. A port left in host
 mode is repaired automatically before the next iOS session.
 
 ```bash
-sudo ./third-eye role            # controller, role, UDCs, runtime overlay
+sudo ./third-eye role            # show controller, role, UDCs, runtime overlay
 sudo ./third-eye role host
 sudo ./third-eye role gadget
 ```
@@ -347,11 +353,11 @@ H.264 NAL units:    non-IDR slice x300, IDR slice x11, SPS x11, PPS x11, AUD x31
 ...
 ```
 
-`decode -o out.mp4` on the same file gives 302 pictures, 1920×1080 High
-profile level 5.2, with no decoding errors. The one `ffmpeg` message, "missing
-picture in access unit", is cosmetic: DJI puts the access-unit delimiter at the
-end of each picture, so the stream ends on a delimiter with no picture after
-it.
+`./third-eye decode -o out.mp4 android-session.pcapng` on the same file gives
+302 pictures, 1920×1080 High profile level 5.2, with no decoding errors. The
+one `ffmpeg` message, "missing picture in access unit", is cosmetic: DJI puts
+the access-unit delimiter at the end of each picture, so the stream ends on a
+delimiter with no picture after it.
 
 When a capture holds no video, `decode` says how far the session got and what
 that points to: nothing on the bus, a device the goggles enumerated and then
@@ -473,11 +479,11 @@ Some tests also check the implementation against **reference captures**:
 bus recordings of the goggles with real iPhones and Android handsets, and with
 this package on a Raspberry Pi 4B. They are not distributed with the source.
 Without them those tests are skipped and the rest run. To include them, point
-`DJIG3_CAPTURES` at the directory holding the files (or put them in a
+`THIRDEYE_CAPTURES` at the directory holding the files (or put them in a
 `captures/` directory beside the checkout):
 
 ```bash
-DJIG3_CAPTURES=/path/to/captures python3 -m pytest tests/ -q
+THIRDEYE_CAPTURES=/path/to/captures python3 -m pytest tests/ -q
 ```
 
 The test suite needs no hardware, no root and no third-party packages besides
@@ -537,4 +543,25 @@ on the wire.
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+MIT License
+
+Copyright (c) 2026 William Robinet willi@mrobi.net
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
