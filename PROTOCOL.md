@@ -1159,9 +1159,9 @@ registers one), so the controller is re-probed with a different `dr_mode`,
 without unloading the module (`mfi.switch_dwc2_role()`):
 
 ```bash
-echo fe980000.usb | sudo tee /sys/bus/platform/drivers/dwc2/unbind
-sudo dtoverlay dwc2 dr_mode=host      # runtime overlay: updates the live DT property
-echo fe980000.usb | sudo tee /sys/bus/platform/drivers/dwc2/bind
+$ echo fe980000.usb | sudo tee /sys/bus/platform/drivers/dwc2/unbind
+$ sudo dtoverlay dwc2 dr_mode=host      # runtime overlay: updates the live DT property
+$ echo fe980000.usb | sudo tee /sys/bus/platform/drivers/dwc2/bind
 # back to gadget mode: unbind, sudo dtoverlay -r dwc2, bind
 ```
 
