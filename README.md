@@ -329,22 +329,22 @@ below are examples.
 
 ```bash
 # summarise a capture, list the 10 most common DUML commands, extract the video
-$ ./third-eye decode android-session.pcapng --commands 10 -o file:out.h264
+$ ./third-eye decode traces/android-session.pcapng --commands 10 -o file:out.h264
 
 # extract a capture's video as a playable MP4
-$ ./third-eye decode android-session.pcapng -o mp4:out.mp4
+$ ./third-eye decode traces/android-session.pcapng -o mp4:out.mp4
 
 # annotated tunnel listing (DUML decoded, frame boundaries marked)
-$ ./third-eye dump android-session.pcapng --limit 20
+$ ./third-eye dump traces/android-session.pcapng --limit 20
 
 # annotated enumeration and AOA or iAP2 control transfers
-$ ./third-eye dump android-session.pcapng --control --limit 30
+$ ./third-eye dump traces/android-session.pcapng --control --limit 30
 
 # decode the iAP2 session of an iOS capture, message by message
-$ ./third-eye iap2 ios-session.pcapng
+$ ./third-eye iap2 traces/ios-session.pcapng
 
 # ...and compare the replies of this package's iAP2 state machine with the iPhone's
-$ ./third-eye iap2 ios-session.pcapng --compare
+$ ./third-eye iap2 traces/ios-session.pcapng --compare
 
 # diagnostic: brute-force pic_init_qp (only useful on an excerpt without
 # parameter sets; the real value is 26)
@@ -354,21 +354,16 @@ $ ./third-eye tune excerpt.pcapng
 `decode` on a recording of a handset session:
 
 ```
-$ ./third-eye decode android-session.pcapng
-capture:            android-session.pcapng
-usb payload bytes:  9501740
-tunnel packets:     5957  (resynchronised over 0 stray bytes)
-video packets:      2405  (8956548 bytes, 322 complete access units)
-control frames:     3552  (0 with a bad CRC-16)
-H.264 NAL units:    non-IDR slice x300, IDR slice x11, SPS x11, PPS x11, AUD x311
-...
+$ ./third-eye decode traces/android-session.pcapng
+capture:            traces/android-session.pcapng
+usb payload bytes:  9837967
+tunnel packets:     4581  (resynchronised over 0 stray bytes)
+video packets:      2535  (9355402 bytes, 459 complete access units)
+control frames:     2046  (0 with a bad CRC-16)
+H.264 NAL units:    non-IDR slice x429, IDR slice x15, SPS x15, PPS x15, AUD x442
+app registration:   1 request(s) from the app, 1 accepted, 17 goggles heartbeat(s)
+app replies:        486 of 486 goggles requests that asked for a reply were answered
 ```
-
-`./third-eye decode -o out.mp4 android-session.pcapng` on the same file gives
-302 pictures, 1920×1080 High profile level 5.2, with no decoding errors. The
-one `ffmpeg` message, "missing picture in access unit", is cosmetic: DJI puts
-the access-unit delimiter at the end of each picture, so the stream ends on a
-delimiter with no picture after it.
 
 When a capture holds no video, `decode` says how far the session got and what
 that points to: nothing on the bus, a device the goggles enumerated and then
@@ -411,7 +406,7 @@ Reading the tunnel out of a capture:
 ```python
 from pryer import capture
 
-data = capture.bulk_stream("android-session.pcapng")    # goggles -> app bytes
+data = capture.bulk_stream("traces/android-session.pcapng")    # goggles -> app bytes
 ```
 
 | module | contents |
