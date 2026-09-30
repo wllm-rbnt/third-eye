@@ -94,7 +94,11 @@ frame rate (the stream is 1920×1080 at 30 fps). Open questions are listed in
 [PROTOCOL.md §13](PROTOCOL.md#13-open-questions).
 
 Latency was not precisely measured yet. Here is a short video that shows what
-to expect: [![Latency demo](./latency.jpg)](./latency.mp4)
+to expect:
+<video src="https://github.com/user-attachments/assets/cd0ce9ef-ef39-40bc-8e06-230c9f6d4ec3"
+       controls
+       width="640">
+</video>
 
 ---
 
